@@ -9,6 +9,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
+  Inject,
 } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
@@ -19,7 +20,10 @@ import { AnyFilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('api/person')
 export class PersonController {
-  constructor(private readonly personService: PersonService) {}
+  constructor(
+    @Inject('person_service') private readonly personService: PersonService,
+    @Inject('person') private readonly person: { name: string },
+  ) {}
   @Post()
   create(@Body() createPersonDto: CreatePersonDto) {
     return `received: ${JSON.stringify(createPersonDto)}`;
@@ -41,7 +45,7 @@ export class PersonController {
   // @Controller('api/person') 的路由和 @Get(':id') 的路由会拼到一起，也就是只有 /api/person/xxx 的 get 请求才会走到这个方法。
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return `receiveId: ${id}`;
+    return `receiveId: ${id}, ${this}`;
   }
 
   @Patch(':id')
